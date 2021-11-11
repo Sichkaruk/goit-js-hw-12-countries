@@ -12,17 +12,26 @@ const searchRef = document.querySelector('[data-action="search"]');
 const countryRef = document.querySelector('.country');
 
 searchRef.addEventListener('input', debounce(renderCountry, 500));
-
+// const searchQuery = event.target.value.trim();
+// const searchQuery = e.currentTarget.elements.query.value.trim()
 function onSearch() {
   if (searchRef.value.trim() === '') {
-    return fetch(`https://restcountries.com/v2/name/${searchRef.value}`).catch(error =>
+    return fetch(`https://restcountries.com/v2/name/${searchRef.value}`)
+      .then(response => {
+        if (response.ok) return response.json();
+      })
+      .catch(error =>
       console.log(error),
     );
   }
   return getInfo();
 }
 
-function renderCountry() {
+function renderCountry(e) {
+  const userRequest = e.target.value.trim();
+
+  if (!userRequest) return;
+  
   onSearch().then(data => {
     if (data.status === 404) {
       error({
@@ -63,3 +72,4 @@ function makeMarkup(data) {
   }
   else countryRef.insertAdjacentHTML('beforeend', countryMarkup(data));
 }
+
